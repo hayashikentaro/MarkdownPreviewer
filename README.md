@@ -18,6 +18,12 @@ scripts/build-app.sh
 
 The standalone app is written to `dist/Markdown Previewer.app`.
 
+To regenerate the app icon:
+
+```sh
+scripts/build-icon.sh
+```
+
 ## Features
 
 - Native SwiftUI macOS app

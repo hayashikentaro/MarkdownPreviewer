@@ -29,6 +29,8 @@
 	</array>
 	<key>CFBundleExecutable</key>
 	<string>MarkdownPreviewer</string>
+	<key>CFBundleIconFile</key>
+	<string>MarkdownPreviewer</string>
 	<key>CFBundleIdentifier</key>
 	<string>local.markdown-previewer</string>
 	<key>CFBundleInfoDictionaryVersion</key>

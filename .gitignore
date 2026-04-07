@@ -1,6 +1,9 @@
 .build/
 .swiftpm/
+.DS_Store
 dist/
+Packaging/AppIcon.iconset/
+Packaging/AppIcon1024.png
 DerivedData/
 *.xcuserstate
 xcuserdata/
