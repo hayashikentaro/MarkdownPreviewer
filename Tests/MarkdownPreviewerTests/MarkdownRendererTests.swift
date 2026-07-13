@@ -58,4 +58,26 @@ final class MarkdownRendererTests: XCTestCase {
         XCTAssertTrue(html.contains(#"href="https://example.com/?q=&quot;&lt;tag&gt;&quot;""#))
         XCTAssertTrue(html.contains("<code>&lt;script&gt;</code>"))
     }
+
+    func testEmbedsLocalRelativeImagesAsDataURLs() throws {
+        let directory = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString, isDirectory: true)
+        let assetsDirectory = directory.appendingPathComponent("assets", isDirectory: true)
+        try FileManager.default.createDirectory(at: assetsDirectory, withIntermediateDirectories: true)
+
+        let imageData = Data(base64Encoded: "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=")!
+        try imageData.write(to: assetsDirectory.appendingPathComponent("logo.png"))
+
+        let markdown = """
+        ![Logo](assets/logo.png)
+        ![Remote](https://example.com/remote.png)
+        """
+
+        let html = MarkdownRenderer().render(markdown, title: "Images", baseURL: directory)
+
+        XCTAssertTrue(html.contains(#"src="data:image/png;base64,"#))
+        XCTAssertTrue(html.contains(imageData.base64EncodedString()))
+        XCTAssertTrue(html.contains(#"alt="Logo""#))
+        XCTAssertTrue(html.contains(#"src="https://example.com/remote.png""#))
+    }
 }

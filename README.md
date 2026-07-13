@@ -28,7 +28,7 @@ scripts/build-icon.sh
 
 - Native SwiftUI macOS app
 - Paper-like preview using WebKit rendering
-- Local image support via the Markdown file's folder as the base URL
+- Local relative image support for Markdown files, including GitHub-style README asset paths
 - `Command-O` to open files
 - `Command-R` to reload
 - Automatic reload when the opened file changes

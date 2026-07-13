@@ -40,7 +40,11 @@ final class PreviewDocument: ObservableObject {
 
         do {
             let markdown = try String(contentsOf: fileURL, encoding: .utf8)
-            html = renderer.render(markdown, title: fileURL.lastPathComponent)
+            html = renderer.render(
+                markdown,
+                title: fileURL.lastPathComponent,
+                baseURL: fileURL.deletingLastPathComponent()
+            )
             lastModificationDate = modificationDate(for: fileURL)
             lastReloadDescription = "Reloaded \(Self.timeFormatter.string(from: Date()))"
         } catch {

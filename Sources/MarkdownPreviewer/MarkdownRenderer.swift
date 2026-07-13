@@ -1,10 +1,11 @@
 import Foundation
 import Markdown
+import UniformTypeIdentifiers
 
 struct MarkdownRenderer {
-    func render(_ markdown: String, title: String) -> String {
+    func render(_ markdown: String, title: String, baseURL: URL? = nil) -> String {
         let document = Document(parsing: markdown)
-        var renderer = RichHTMLRenderer()
+        var renderer = RichHTMLRenderer(baseURL: baseURL)
         let body = renderer.visit(document)
 
         return """
@@ -238,9 +239,15 @@ struct MarkdownRenderer {
 private struct RichHTMLRenderer: MarkupVisitor {
     typealias Result = String
 
+    let baseURL: URL?
+
     private var tableAlignments: [Table.ColumnAlignment?] = []
     private var currentTableColumn = 0
     private var slugCounts: [String: Int] = [:]
+
+    init(baseURL: URL?) {
+        self.baseURL = baseURL
+    }
 
     mutating func visit(_ markup: Markup) -> String {
         markup.accept(&self)
@@ -330,7 +337,7 @@ private struct RichHTMLRenderer: MarkupVisitor {
     mutating func visitImage(_ image: Image) -> String {
         var attributes: [String] = []
         if let source = image.source, !source.isEmpty {
-            attributes.append("src=\"\(escapeAttribute(source))\"")
+            attributes.append("src=\"\(escapeAttribute(resolvedImageSource(source)))\"")
         }
         if let title = image.title, !title.isEmpty {
             attributes.append("title=\"\(escapeAttribute(title))\"")
@@ -485,6 +492,55 @@ private struct RichHTMLRenderer: MarkupVisitor {
         let count = slugCounts[slug, default: 0]
         slugCounts[slug] = count + 1
         return count == 0 ? slug : "\(slug)-\(count)"
+    }
+
+    private func resolvedImageSource(_ source: String) -> String {
+        guard
+            let baseURL,
+            baseURL.isFileURL,
+            isRelativeImageSource(source),
+            let imageURL = localImageURL(for: source, relativeTo: baseURL),
+            let data = try? Data(contentsOf: imageURL)
+        else {
+            return source
+        }
+
+        let mimeType = Self.mimeType(for: imageURL)
+        return "data:\(mimeType);base64,\(data.base64EncodedString())"
+    }
+
+    private func isRelativeImageSource(_ source: String) -> Bool {
+        guard !source.hasPrefix("#"), !source.hasPrefix("/") else {
+            return false
+        }
+
+        if let url = URL(string: source), url.scheme != nil {
+            return false
+        }
+
+        return true
+    }
+
+    private func localImageURL(for source: String, relativeTo baseURL: URL) -> URL? {
+        let path = source
+            .split(separator: "#", maxSplits: 1, omittingEmptySubsequences: false)[0]
+            .split(separator: "?", maxSplits: 1, omittingEmptySubsequences: false)[0]
+
+        guard !path.isEmpty else {
+            return nil
+        }
+
+        let decodedPath = String(path).removingPercentEncoding ?? String(path)
+        return baseURL.appendingPathComponent(decodedPath).standardizedFileURL
+    }
+
+    private static func mimeType(for url: URL) -> String {
+        if let type = UTType(filenameExtension: url.pathExtension),
+           let mimeType = type.preferredMIMEType {
+            return mimeType
+        }
+
+        return "application/octet-stream"
     }
 }
 
