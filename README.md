@@ -32,4 +32,6 @@ scripts/build-icon.sh
 - `Command-O` to open files
 - `Command-R` to reload
 - Automatic reload when the opened file changes
-- Basic Markdown support: headings, paragraphs, unordered lists, blockquotes, code fences, links, images, inline code, bold, and emphasis
+- CommonMark/GFM rendering powered by `swift-markdown`
+- Tables, ordered and nested lists, task lists, strikethrough, autolinks, reference links, heading anchors, and fenced code languages
+- Syntax highlighting and copy buttons for code blocks when the bundled WebKit view can load highlight.js from the CDN
