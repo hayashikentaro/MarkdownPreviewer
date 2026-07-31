@@ -1,6 +1,7 @@
 import AppKit
 import Foundation
 import UniformTypeIdentifiers
+import WebKit
 
 final class PreviewDocument: ObservableObject {
     @Published var fileURL: URL?
@@ -16,9 +17,21 @@ final class PreviewDocument: ObservableObject {
     private var reloadTimer: Timer?
     private var lastModificationDate: Date?
     private var mdzipArchive: MDZipArchive?
+    private weak var printWebView: WKWebView?
+    private let printInfo: NSPrintInfo = {
+        let printInfo = NSPrintInfo.shared.copy() as! NSPrintInfo
+        printInfo.horizontalPagination = .fit
+        printInfo.verticalPagination = .automatic
+        printInfo.isHorizontallyCentered = true
+        return printInfo
+    }()
 
     deinit {
         mdzipArchive?.removeExtractedFiles()
+    }
+
+    var canPrint: Bool {
+        html != nil
     }
 
     func showOpenPanel() {
@@ -93,6 +106,35 @@ final class PreviewDocument: ObservableObject {
 
         openArchiveMarkdown(relativePath)
         return true
+    }
+
+    func setPrintWebView(_ webView: WKWebView?) {
+        printWebView = webView
+    }
+
+    func showPageSetup() {
+        guard canPrint else { return }
+        NSPageLayout().runModal(with: printInfo)
+    }
+
+    func printCurrentDocument() {
+        guard let printWebView, canPrint else { return }
+
+        let operation = printWebView.printOperation(with: printInfo)
+        operation.jobTitle = selectedArchivePath ?? fileURL?.deletingPathExtension().lastPathComponent
+        operation.showsPrintPanel = true
+        operation.showsProgressPanel = true
+
+        if let window = printWebView.window {
+            operation.runModal(
+                for: window,
+                delegate: nil,
+                didRun: nil,
+                contextInfo: nil
+            )
+        } else {
+            operation.run()
+        }
     }
 
     private func reloadMDZip(_ fileURL: URL) throws {

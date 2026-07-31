@@ -45,6 +45,7 @@ scripts/build-icon.sh
 - MDZip archive safety checks for unsafe paths, symbolic links, excessive sizes, and suspicious compression ratios
 - `Command-O` to open files
 - `Command-R` to reload
+- `Command-P` to print or save the current document as PDF using the macOS print panel
 - Automatic reload when the opened file changes
 - CommonMark/GFM rendering powered by `swift-markdown`
 - Tables, ordered and nested lists, task lists, strikethrough, autolinks, reference links, heading anchors, and fenced code languages

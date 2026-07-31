@@ -5,9 +5,10 @@ struct MarkdownWebView: NSViewRepresentable {
     let html: String
     let baseURL: URL?
     let onOpenURL: (URL) -> Bool
+    let onWebViewReady: (WKWebView?) -> Void
 
     func makeCoordinator() -> Coordinator {
-        Coordinator(onOpenURL: onOpenURL)
+        Coordinator(onOpenURL: onOpenURL, onWebViewReady: onWebViewReady)
     }
 
     func makeNSView(context: Context) -> WKWebView {
@@ -18,6 +19,7 @@ struct MarkdownWebView: NSViewRepresentable {
         webView.navigationDelegate = context.coordinator
         webView.allowsMagnification = true
         webView.setValue(false, forKey: "drawsBackground")
+        context.coordinator.onWebViewReady(webView)
         return webView
     }
 
@@ -25,11 +27,21 @@ struct MarkdownWebView: NSViewRepresentable {
         webView.loadHTMLString(html, baseURL: baseURL)
     }
 
+    static func dismantleNSView(_ webView: WKWebView, coordinator: Coordinator) {
+        coordinator.onWebViewReady(nil)
+        webView.navigationDelegate = nil
+    }
+
     final class Coordinator: NSObject, WKNavigationDelegate {
         let onOpenURL: (URL) -> Bool
+        let onWebViewReady: (WKWebView?) -> Void
 
-        init(onOpenURL: @escaping (URL) -> Bool) {
+        init(
+            onOpenURL: @escaping (URL) -> Bool,
+            onWebViewReady: @escaping (WKWebView?) -> Void
+        ) {
             self.onOpenURL = onOpenURL
+            self.onWebViewReady = onWebViewReady
         }
 
         func webView(

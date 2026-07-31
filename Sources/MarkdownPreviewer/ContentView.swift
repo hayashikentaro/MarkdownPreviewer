@@ -13,7 +13,8 @@ struct ContentView: View {
                 MarkdownWebView(
                     html: html,
                     baseURL: document.baseURL,
-                    onOpenURL: document.openLinkedURL
+                    onOpenURL: document.openLinkedURL,
+                    onWebViewReady: document.setPrintWebView
                 )
             } else {
                 emptyState

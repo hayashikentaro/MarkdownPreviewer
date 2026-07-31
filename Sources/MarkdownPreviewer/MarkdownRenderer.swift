@@ -202,8 +202,23 @@ struct MarkdownRenderer {
           }
         }
         @media print {
-          body { padding: 0; background: var(--paper); }
-          main { border: 0; box-shadow: none; border-radius: 0; max-width: none; }
+          body {
+            padding: 0;
+            background: var(--paper);
+            font-size: 11pt;
+            -webkit-print-color-adjust: exact;
+          }
+          main {
+            min-height: 0;
+            padding: 0;
+            border: 0;
+            box-shadow: none;
+            border-radius: 0;
+            max-width: none;
+          }
+          pre, blockquote, table, img, .mermaid {
+            break-inside: avoid;
+          }
         }
         </style>
         </head>

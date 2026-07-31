@@ -114,4 +114,13 @@ final class MarkdownRendererTests: XCTestCase {
         XCTAssertTrue(html.contains("&lt;script&gt;window.evil = true&lt;/script&gt;"))
         XCTAssertTrue(html.contains("&lt;img src=x onerror=&quot;window.evil = true&quot;&gt;"))
     }
+
+    func testIncludesPrintLayoutStyles() {
+        let html = MarkdownRenderer().render("# Printable", title: "Print")
+
+        XCTAssertTrue(html.contains("@media print"))
+        XCTAssertTrue(html.contains("-webkit-print-color-adjust: exact"))
+        XCTAssertTrue(html.contains("break-inside: avoid"))
+        XCTAssertTrue(html.contains("font-size: 11pt"))
+    }
 }
