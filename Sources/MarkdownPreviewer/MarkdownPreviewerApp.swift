@@ -14,7 +14,7 @@ struct MarkdownPreviewerApp: App {
         }
         .commands {
             CommandGroup(replacing: .newItem) {
-                Button("Open Markdown...") {
+                Button("Open Markdown or MDZip...") {
                     document.showOpenPanel()
                 }
                 .keyboardShortcut("o", modifiers: [.command])

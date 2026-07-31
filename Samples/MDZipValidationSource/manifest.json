@@ -1,0 +1,12 @@
+{
+  "spec": {
+    "name": "mdzip-spec",
+    "version": "1.1.0"
+  },
+  "title": "Markdown Previewer MDZip動作確認",
+  "mode": "project",
+  "entryPoint": "index.md",
+  "language": "ja",
+  "description": "MarkdownPreviewerのMDZip対応を手動確認するためのサンプルです。",
+  "cover": "assets/diagram.svg"
+}
