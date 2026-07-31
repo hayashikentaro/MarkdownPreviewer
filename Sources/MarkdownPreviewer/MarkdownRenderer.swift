@@ -73,6 +73,20 @@ struct MarkdownRenderer {
         a { color: var(--link); text-decoration-thickness: 0.08em; text-underline-offset: 0.16em; }
         img { max-width: 100%; border-radius: 8px; }
         mark { background: var(--mark); color: inherit; padding: 0 0.2em; border-radius: 3px; }
+        .mermaid {
+          display: flex;
+          justify-content: center;
+          overflow-x: auto;
+          margin: 1em 0;
+          padding: 16px;
+          border: 1px solid var(--border);
+          border-radius: 10px;
+          background: var(--paper);
+        }
+        .mermaid svg {
+          max-width: 100%;
+          height: auto;
+        }
         ul, ol { padding-left: 1.65em; margin: 0 0 1em; }
         li > ul, li > ol { margin-top: 0.25em; margin-bottom: 0.25em; }
         li > p { margin: 0.25em 0; }
@@ -198,9 +212,18 @@ struct MarkdownRenderer {
         \(body)
         </main>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
         <script>
         if (window.hljs) {
           document.querySelectorAll("pre code").forEach((block) => hljs.highlightElement(block));
+        }
+        if (window.mermaid) {
+          const isDarkMode = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+          mermaid.initialize({
+            startOnLoad: true,
+            securityLevel: "strict",
+            theme: isDarkMode ? "dark" : "default"
+          });
         }
         document.querySelectorAll(".code-copy").forEach((button) => {
           button.addEventListener("click", async () => {
@@ -263,6 +286,10 @@ private struct RichHTMLRenderer: MarkupVisitor {
 
     mutating func visitCodeBlock(_ codeBlock: CodeBlock) -> String {
         let language = codeBlock.language?.trimmingCharacters(in: .whitespacesAndNewlines)
+        if language?.lowercased() == "mermaid" {
+            return "<div class=\"mermaid\">\(escape(codeBlock.code))</div>\n"
+        }
+
         let languageClass = language.map { " class=\"language-\(escapeAttribute($0))\"" } ?? ""
         let languageAttribute = language.map { " data-language=\"\(escapeAttribute($0))\"" } ?? ""
         return "<pre\(languageAttribute)><button class=\"code-copy\" type=\"button\" aria-label=\"Copy code\">Copy</button><code\(languageClass)>\(escape(codeBlock.code))</code></pre>\n"
@@ -287,7 +314,7 @@ private struct RichHTMLRenderer: MarkupVisitor {
     }
 
     mutating func visitHTMLBlock(_ html: HTMLBlock) -> String {
-        html.rawHTML
+        "<pre><code>\(escape(html.rawHTML))</code></pre>\n"
     }
 
     mutating func visitListItem(_ listItem: ListItem) -> String {
@@ -347,7 +374,7 @@ private struct RichHTMLRenderer: MarkupVisitor {
     }
 
     mutating func visitInlineHTML(_ inlineHTML: InlineHTML) -> String {
-        inlineHTML.rawHTML
+        escape(inlineHTML.rawHTML)
     }
 
     mutating func visitLineBreak(_ lineBreak: LineBreak) -> String {
