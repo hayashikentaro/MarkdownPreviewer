@@ -18,6 +18,18 @@ scripts/build-app.sh
 
 The standalone app is written to `dist/Markdown Previewer.app`.
 
+To create a release zip:
+
+```sh
+ditto -c -k --keepParent "dist/Markdown Previewer.app" "dist/MarkdownPreviewer-0.2.0.zip"
+```
+
+If macOS blocks the app because it was downloaded from the internet or copied from another machine, remove the quarantine attribute before opening it:
+
+```sh
+xattr -dr com.apple.quarantine "Markdown Previewer.app"
+```
+
 To regenerate the app icon:
 
 ```sh
