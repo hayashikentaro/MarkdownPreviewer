@@ -14,7 +14,7 @@ struct MarkdownPreviewerApp: App {
         }
         .commands {
             CommandGroup(replacing: .newItem) {
-                Button("Open Markdown...") {
+                Button("Open Markdown or MDZip...") {
                     document.showOpenPanel()
                 }
                 .keyboardShortcut("o", modifiers: [.command])
@@ -24,6 +24,19 @@ struct MarkdownPreviewerApp: App {
                 }
                 .keyboardShortcut("r", modifiers: [.command])
                 .disabled(document.fileURL == nil)
+            }
+
+            CommandGroup(replacing: .printItem) {
+                Button("Page Setup...") {
+                    document.showPageSetup()
+                }
+                .disabled(!document.canPrint)
+
+                Button("Print...") {
+                    document.printCurrentDocument()
+                }
+                .keyboardShortcut("p", modifiers: [.command])
+                .disabled(!document.canPrint)
             }
         }
     }

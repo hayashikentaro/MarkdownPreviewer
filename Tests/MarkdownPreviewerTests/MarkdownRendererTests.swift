@@ -80,4 +80,47 @@ final class MarkdownRendererTests: XCTestCase {
         XCTAssertTrue(html.contains(#"alt="Logo""#))
         XCTAssertTrue(html.contains(#"src="https://example.com/remote.png""#))
     }
+
+    func testRendersMermaidCodeBlocksAsDiagrams() {
+        let markdown = """
+        ```mermaid
+        flowchart TD
+            A[Start] --> B{Ready?}
+            B -- Yes --> C[Render]
+        ```
+        """
+
+        let html = MarkdownRenderer().render(markdown, title: "Mermaid")
+
+        XCTAssertTrue(html.contains(#"<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>"#))
+        XCTAssertTrue(html.contains(#"mermaid.initialize"#))
+        XCTAssertTrue(html.contains(#"<div class="mermaid">flowchart TD"#))
+        XCTAssertTrue(html.contains(#"A[Start] --&gt; B{Ready?}"#))
+        XCTAssertFalse(html.contains(#"<pre data-language="mermaid">"#))
+        XCTAssertFalse(html.contains(#"<code class="language-mermaid">"#))
+    }
+
+    func testDoesNotExecuteRawHTMLFromMarkdown() {
+        let markdown = """
+        <script>window.evil = true</script>
+
+        Text with <img src=x onerror="window.evil = true"> inline HTML.
+        """
+
+        let html = MarkdownRenderer().render(markdown, title: "Untrusted")
+
+        XCTAssertFalse(html.contains("<script>window.evil"))
+        XCTAssertFalse(html.contains("<img src=x"))
+        XCTAssertTrue(html.contains("&lt;script&gt;window.evil = true&lt;/script&gt;"))
+        XCTAssertTrue(html.contains("&lt;img src=x onerror=&quot;window.evil = true&quot;&gt;"))
+    }
+
+    func testIncludesPrintLayoutStyles() {
+        let html = MarkdownRenderer().render("# Printable", title: "Print")
+
+        XCTAssertTrue(html.contains("@media print"))
+        XCTAssertTrue(html.contains("-webkit-print-color-adjust: exact"))
+        XCTAssertTrue(html.contains("break-inside: avoid"))
+        XCTAssertTrue(html.contains("font-size: 11pt"))
+    }
 }

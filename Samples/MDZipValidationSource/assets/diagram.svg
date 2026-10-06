@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="280" viewBox="0 0 720 280" role="img" aria-labelledby="title description">
+  <title id="title">MDZip archive structure</title>
+  <desc id="description">An MDZip archive containing a manifest, Markdown documents, and an image asset.</desc>
+  <rect width="720" height="280" rx="24" fill="#f6f8fa"/>
+  <rect x="36" y="36" width="648" height="208" rx="18" fill="#ffffff" stroke="#0969da" stroke-width="4"/>
+  <text x="68" y="84" fill="#0969da" font-family="-apple-system, sans-serif" font-size="28" font-weight="700">MDZip-Validation.mdz</text>
+  <text x="84" y="130" fill="#1f2328" font-family="ui-monospace, monospace" font-size="21">├── manifest.json</text>
+  <text x="84" y="166" fill="#1f2328" font-family="ui-monospace, monospace" font-size="21">├── index.md</text>
+  <text x="84" y="202" fill="#1f2328" font-family="ui-monospace, monospace" font-size="21">├── guide/</text>
+  <text x="380" y="130" fill="#1f2328" font-family="ui-monospace, monospace" font-size="21">└── assets/</text>
+  <text x="408" y="166" fill="#1f2328" font-family="ui-monospace, monospace" font-size="21">└── diagram.svg</text>
+</svg>

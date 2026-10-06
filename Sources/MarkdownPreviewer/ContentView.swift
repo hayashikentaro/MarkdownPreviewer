@@ -10,7 +10,12 @@ struct ContentView: View {
             Divider()
 
             if let html = document.html {
-                MarkdownWebView(html: html, baseURL: document.baseURL)
+                MarkdownWebView(
+                    html: html,
+                    baseURL: document.baseURL,
+                    onOpenURL: document.openLinkedURL,
+                    onWebViewReady: document.setPrintWebView
+                )
             } else {
                 emptyState
             }
@@ -38,6 +43,17 @@ struct ContentView: View {
                 document.reload()
             }
             .disabled(document.fileURL == nil)
+
+            if !document.archiveMarkdownPaths.isEmpty {
+                Menu(document.selectedArchivePath ?? "Documents") {
+                    ForEach(document.archiveMarkdownPaths, id: \.self) { path in
+                        Button(path) {
+                            document.openArchiveMarkdown(path)
+                        }
+                    }
+                }
+                .frame(maxWidth: 260)
+            }
 
             if let fileURL = document.fileURL {
                 Text(fileURL.lastPathComponent)
@@ -67,10 +83,10 @@ struct ContentView: View {
                 .font(.system(size: 56))
                 .foregroundStyle(.secondary)
 
-            Text("Open a Markdown File")
+            Text("Open a Markdown or MDZip File")
                 .font(.title2.weight(.semibold))
 
-            Text("Use Command-O or drag a .md file here to preview it like a document.")
+            Text("Use Command-O or drag a .md or .mdz file here to preview it like a document.")
                 .foregroundStyle(.secondary)
 
             Button("Choose File...") {
